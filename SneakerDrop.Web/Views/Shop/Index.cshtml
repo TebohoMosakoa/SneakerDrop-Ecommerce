@@ -1,0 +1,199 @@
+﻿@using SneakerDrop.Web.Code;
+@model SneakerDrop.Web.ViewModels.ShopViewModel
+@{
+    ViewBag.Title = "Index";
+
+}
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- BASE CSS -->
+<link href="~/Content/css/bootstrap.custom.css" rel="stylesheet" />
+<link href="~/Content/css/style.css" rel="stylesheet" />
+
+<!-- SPECIFIC CSS -->
+<link href="~/Content/css/listing.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="~/Content/stylesheets/bootstrap.css">
+
+
+@*<link rel="stylesheet" type="text/css" href="~/Content/stylesheets/style.css">*@
+<link rel="stylesheet" type="text/css" href="~/Content/stylesheets/responsive.css">
+
+<link rel="stylesheet" type="text/css" href="~/Content/stylesheets/colors/color1.css" id="colors">
+
+  
+<link rel="stylesheet" type="text/css" href="~/Content/stylesheets/animate.css">
+<main>
+    <div class="container margin_30">
+        <div class="row">
+            <aside class="col-lg-3" id="sidebar_fixed">
+                <div class="filter_col">
+                    <div class="inner_bt"><a href="#" class="open_filters"><i class="ti-close"></i></a></div>
+                    <div class="filter_type version_2">
+                        <form role="search" method="get" class="search-form" action="@Url.Action("Index", "Shop")">
+                            <label>
+                                <input type="search" class="form-control" placeholder="Search …" @*value="@Model.SearchTerm"*@ name="searchTerm">
+                            </label>
+                            <input type="submit" class="btn_1" value="Search">
+                        </form>
+
+                        <br />
+                    </div>
+                    <div class="filter_type version_2">
+                        <h4><a href="#filter_2" data-toggle="collapse" class="opened">Sort By</a></h4>
+                        <div class="collapse show" id="filter_2">
+                            <ul>
+                                <li><a style="text-decoration: none; color: dimgrey; font-weight:bolder" href="@Url.Action("Index", "Shop", new { sortBy = (int)SortByEnums.Default, categoryID = Model.CategoryID })" class="@(Model.SortBy.HasValue ? Model.SortBy.Value == (int)SortByEnums.Default ? "active" : string.Empty : string.Empty)">Latest Sneakers</a></li>
+                                <li><a style="text-decoration: none; color: dimgrey; font-weight:bolder" href="@Url.Action("Index", "Shop", new { sortBy = (int)SortByEnums.Popularity, categoryID = Model.CategoryID })" class="@(Model.SortBy.HasValue ? Model.SortBy.Value == (int)SortByEnums.Popularity ? "active" : string.Empty : string.Empty)">Popular</a></li>
+                                <li><a style="text-decoration: none; color: dimgrey; font-weight:bolder" href="@Url.Action("Index", "Shop", new { sortBy = (int)SortByEnums.PriceLowToHigh, categoryID = Model.CategoryID })" class="@(Model.SortBy.HasValue ? Model.SortBy.Value == (int)SortByEnums.PriceLowToHigh ? "active" : string.Empty : string.Empty)">Price: Low to High</a></li>
+                                <li><a style="text-decoration: none; color: dimgrey; font-weight:bolder" href="@Url.Action("Index", "Shop", new { sortBy = (int)SortByEnums.PriceHighToLow, categoryID = Model.CategoryID})" class="@(Model.SortBy.HasValue ? Model.SortBy.Value == (int)SortByEnums.PriceHighToLow ? "active" : string.Empty : string.Empty)">Price: High to Low</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--/filter_type(sort By)-->
+                    <div class="filter_type version_2">
+                        <h4><a href="#filter_1" data-toggle="collapse" class="opened">Featured Categories</a></h4>
+                        <div class="collapse show" id="filter_1">
+                            <ul>
+                                @foreach (var category in Model.FeaturedCategoies)
+                                {
+                                    <li>
+                                        <a style="text-decoration: none; color: dimgrey; font-weight:bolder" href="@Url.Action("Index", "Shop", new { categoryID = category.Id, sortBy = Model.SortBy })" class="@(Model.CategoryID.HasValue && Model.CategoryID.Value == category.Id ? "active" : string.Empty)">@category.Name</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        <!-- /filter_type -->
+                    </div>
+                    <!-- /filter_type -->
+
+                    @*<div class="widget widget-price">
+                        <h5 class="widget-title">Filter by price</h5>
+                        <div class="price-filter">
+                            <div id="slide-range"></div>
+                            <p class="amount">
+                                Price: <input type="text" id="amount" disabled="">
+                            </p>
+                        </div>
+                    </div>*@
+                    <!-- /filter_type -->
+                    <div class="buttons">
+                        <a href="@Url.Action("Index","Shop")" class="btn_1">Reset Filters</a>
+                    </div>
+                </div>
+            </aside>
+            <!-- /col -->
+            <div class="col-lg-9">
+                <div class="top_banner">
+                    <div class="opacity-mask d-flex align-items-center" data-opacity-mask="rgba(0, 0, 0, 0.3)">
+                        <div class="container pl-lg-5">
+                            <h1>Sneakers</h1>
+                        </div>
+                    </div>
+                    <img src="~/Content/images/system/shop banner.jpg" class="img-fluid" alt=""/>
+                </div>
+                <!-- /top_banner -->
+                <div id="stick_here"></div>
+                <br />
+                <br />
+                
+                <div id="productsDiv">
+                    @{
+                        var filterProductsViewModel = new SneakerDrop.Web.ViewModels.FilterProductsViewModel();
+                        filterProductsViewModel.Products = Model.Products;
+                        filterProductsViewModel.Pager = Model.Pager;
+
+
+                        Html.RenderPartial("FilterProducts", filterProductsViewModel);
+                     }
+                </div>
+               
+            </div>
+            <!-- /col -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</main>
+<div id="toTop"></div><!-- Back to top button -->
+
+
+<!--Price Slider Jquery-->
+@*<script>
+    var timeOut;
+
+    var priceSlider = $("#slide-range").slider({
+        range: true,
+        min: 0,
+        max: @Model.MaximumPrice,
+        values: [0, @Model.MaximumPrice],
+        slide: function (event, ul) {
+            var minPrice = ul.values[0];
+            var maxPrice = ul.values[1]
+            
+            $("#amount").val("R" + minPrice + ",00" + " - " + "R" + maxPrice + ",00");
+
+            clearTimeout(timeOut);
+            timeOut = setTimeout(GetData, 500);
+        }
+    });
+    
+
+    function GetData() {
+        $.ajax({
+			url: '@Url.Action("FilterProducts", "Shop")',
+            data: {
+                sortBy: '@Model.SortBy'
+                categoryID: '@Model.CategoryID',
+                minimumPrice : priceSlider.slider("values",0),
+                maximumPrice : priceSlider.slider("values",1)
+			}
+		})
+        .done(function (response) {
+        	$("#productsDiv").html(response);
+        })
+        .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+        	alert("FAIL");
+        });
+    }
+</script>*@
+<!-- COMMON SCRIPTS -->
+<script src="~/Content/js/common_scripts.js"></script>
+<script src="~/Content/js/main.js"></script>
+
+<!-- SPECIFIC SCRIPTS -->
+<script src="~/Content/js/sticky_sidebar.min.js"></script>
+<script src="~/Content/js/specific_listing.js"></script><!-- Javascript -->
+@*<script src="~/Content/javascript/jquery.min.js"></script>
+<script src="~/Content/javascript/tether.min.js"></script>
+<script src="~/Content/javascript/bootstrap.min.js"></script>
+<script src="~/Content/javascript/jquery.easing.js"></script>
+<script src="~/Content/javascript/parallax.js"></script>
+<script src="~/Content/javascript/jquery-waypoints.js"></script>
+<script src="~/Content/javascript/jquery-countTo.js"></script>
+<script src="~/Content/javascript/jquery.countdown.js"></script>
+<script src="~/Content/javascript/jquery.flexslider-min.js"></script>
+<script src="~/Content/javascript/images-loaded.js"></script>
+<script src="~/Content/javascript/jquery.isotope.min.js"></script>
+<script src="~/Content/javascript/magnific.popup.min.js"></script>
+<script src="~/Content/javascript/jquery.hoverdir.js"></script>
+<script src="~/Content/javascript/owl.carousel.min.js"></script>
+<script src="~/Content/javascript/equalize.min.js"></script>
+<script src="~/Content/javascript/gmap3.min.js"></script>*@
+@*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAIEU6OT3xqCksCetQeNLIPps6-AYrhq-s&region=GB"></script>
+<script src="~/Content/javascript/jquery-ui.js"></script>
+<script src="~/Content/javascript/jquery.cookie.js"></script>
+<script src="~/Content/javascript/main.js"></script>*@
+<!-- Revoluti~/Content/on Slider -->
+@*<script src="~/Content/rev-slider/js/jquery.themepunch.tools.min.js"></script>
+<script src="~/Content/rev-slider/js/jquery.themepunch.revolution.min.js"></script>
+<script src="~/Content/javascript/rev-slider.js"></script>*@
+<!-- Load Ext~/Content/ensions only on Local File Systems ! The following part can be removed on Server for On Demand Loading -->
+@*<script src="~/Content/rev-slider/js/extensions/revolution.extension.actions.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.carousel.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.kenburn.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.layeranimation.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.migration.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.navigation.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.parallax.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.slideanims.min.js"></script>
+<script src="~/Content/rev-slider/js/extensions/revolution.extension.video.min.js"></script>*@

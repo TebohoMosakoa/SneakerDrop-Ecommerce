@@ -1,0 +1,71 @@
+﻿@model SneakerDrop.Web.ViewModels.ProductWidgetViewModel
+
+@{
+    var defaultImageURL = "/Content/images/system/placeholder-image.png";
+}
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+@if (Model != null && Model.Products != null)
+{
+    <div class="row small-gutters">
+        @foreach (var product in Model.Products)
+        {
+            var imageUrl = string.IsNullOrEmpty(product.ImageURL) ? defaultImageURL : product.ImageURL;
+
+            <div class="col-6 col-md-4 col-xl-3">
+                <div class="grid_item">
+                    <figure>
+                        @if (Model.IsLatestProducts)
+                        {
+                            <span class="ribbon off">New</span>
+                        }
+                        <a href="@Url.Action("Details","Product", new{ ID = product.Id})">
+                            <img class="img-fluid lazy" src="@imageUrl" alt="Image" style="height:300px" />
+                        </a>
+                    </figure>
+
+                    <a href="product-detail-1.html">
+                        <h3>@product.Name</h3>
+                    </a>
+                    <div class="price_box">
+                        <span class="new_price"><text>R</text>@product.Price</span>
+                    </div>
+                    <ul>
+                        <li><a @*id="productAddToCart"*@ class="tooltip-1 productAddToCart" data-id="@product.Id" data-toggle="tooltip" data-placement="left" title="Add to cart"><i class="ti-shopping-cart"></i><span>Add to cart</span></a></li>
+                    </ul>
+                </div>
+                <!-- /grid_item -->
+            </div>
+            <!-- /col -->
+        }
+    </div>
+}
+
+<script>
+    var products;
+    $(".productAddToCart").click(function () {
+
+        var existingCookies = $.cookie('CartProducts');
+
+        if (existingCookies != undefined && existingCookies != "" && existingCookies != null) {
+            products = existingCookies.split('-');
+        }
+        else {
+            products = [];
+        }
+
+        var productID = $(this).attr('data-id');
+
+        products.push(productID);
+
+        $.cookie('CartProducts', products.join('-'), { path: '/' });
+
+        swal("Done", "Product added to cart", "success");
+    });
+
+</script>
+
+
+
+

@@ -1,0 +1,87 @@
+﻿@model SneakerDrop.Web.ViewModels.FilterProductsViewModel
+@{
+
+    var defaultImageURL = "/Content/images/system/placeholder-image.png";
+}
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+@foreach (var product in Model.Products)
+{
+    var imageURL = string.IsNullOrEmpty(product.ImageURL) ? defaultImageURL : product.ImageURL;
+    <div class="row row_item">
+        <div class="col-sm-4">
+            <figure>
+                <a href="@Url.Action("Details","Product", new{ ID = product.Id})">
+                    <img class="img-fluid lazy" src="@imageURL" alt="">
+                </a>
+            </figure>
+        </div>
+        <div class="col-sm-8">
+            <a href="@Url.Action("Details","Product", new{ ID = product.Id})">
+                <h3>@product.Name</h3>
+            </a>
+            <p>@product.Description</p>
+            <div class="price_box">
+                <span class="new_price"><text>R</text>@product.Price</span>
+            </div>
+            <ul>
+                <li><a @*id="productAddToCart"*@ class="btn_1 productAddToCart" data-id="@product.Id">Add to cart</a></li>
+            </ul>
+        </div>
+    </div>
+}
+
+
+@if (Model.Pager != null && Model.Pager.TotalPages > 1)
+{
+
+    <div class="pagination__wrapper">
+        <ul class="pagination">
+            @if (Model.Pager.CurrentPage > 1)
+            {
+                <li>
+                    <a href="@Url.Action("Index","Shop", new { pageNo = Model.Pager.CurrentPage - 1 })" class="prev" title="previous page">&#10094;</a>
+                </li>
+            }
+            @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+            {
+                string activeClass = Model.Pager.CurrentPage == page ? "active bg-info" : string.Empty;
+
+                <li class="@activeClass">
+                    <a href="@Url.Action("Index","Shop", new { pageNo = page })">@page</a>
+                </li>
+            }
+
+            @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+            {
+                <li><a href="@Url.Action("Index","Shop", new { pageNo = @Model.Pager.CurrentPage + 1 })" class="next" title="next page">Next</a></li>
+                <li><a href="@Url.Action("Index","Shop", new { pageNo = @Model.Pager.EndPage })" class="next" title="next page">&#10095;</a></li>
+            }
+        </ul>
+    </div>
+}
+
+<script>
+    var products;
+    $(".productAddToCart").click(function () {
+
+        var existingCookies = $.cookie('CartProducts');
+
+        if (existingCookies != undefined && existingCookies != "" && existingCookies != null) {
+            products = existingCookies.split('-');
+        }
+        else {
+            products = [];
+        }
+
+        var productID = $(this).attr('data-id');
+
+        products.push(productID);
+
+        $.cookie('CartProducts', products.join('-'), { path: '/' });
+        updateCartProducts();
+
+        swal("Done", "Product added to cart", "success");
+    });
+
+</script>
