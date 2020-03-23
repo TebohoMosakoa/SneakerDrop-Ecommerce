@@ -9,14 +9,15 @@ using System.Web.Mvc;
 
 namespace SneakerDrop.Web.Controllers
 {
-    [Authorize]
+    
     public class ProductController : Controller
     {
+        [Authorize]
         public ActionResult Index()
         {
             return View();
         }
-
+        [Authorize]
         public ActionResult ProductTable(string search, int? pageNo)
         {
             var pageSize = ConfigurationsService.Instance.PageSize();
@@ -33,7 +34,7 @@ namespace SneakerDrop.Web.Controllers
 
             return PartialView(model);
         }
-
+        [Authorize]
         [HttpGet]
         public ActionResult Create()
         {
@@ -43,7 +44,7 @@ namespace SneakerDrop.Web.Controllers
 
             return PartialView(model);
         }
-
+        [Authorize]
         [HttpPost]
         public ActionResult Create(NewProductViewModel model)
         {
@@ -57,7 +58,7 @@ namespace SneakerDrop.Web.Controllers
             ProductsService.Instance.SaveProduct(newProduct);
             return RedirectToAction("ProductTable");
         }
-
+        [Authorize]
         [HttpGet]
         public ActionResult Edit(int ID)
         {
@@ -76,7 +77,7 @@ namespace SneakerDrop.Web.Controllers
 
             return PartialView(model);
         }
-
+        [Authorize]
         [HttpPost]
         public ActionResult Edit(EditProductViewModel model)
         {
@@ -98,7 +99,7 @@ namespace SneakerDrop.Web.Controllers
 
             return RedirectToAction("ProductTable");
         }
-
+        [Authorize]
         [HttpPost]
         public ActionResult Delete(int ID)
         {
